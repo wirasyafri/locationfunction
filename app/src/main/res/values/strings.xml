@@ -6,7 +6,7 @@
     <string name="nav_header_subtitle">1541180215 / TI-4E</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-    <string name="location_text">"Latitude: %1$.4f \n Longitude: %2$.4f
-\n Timestamp: %3$tr"</string>
+    <string name="location_text">"Latitude: %1$.4f \n Longitude: %2$.4f \n Timestamp: %3$tr"</string>
     <string name="alamat_text">"Alamat:%1$s \n Timestamp: %2$tr</string>
+    <string name="alamat_detail">"Nama:%1$s \n Alamat: %2$s \n Timestamp: %3$tr"</string>
 </resources>

@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ti4e.wira.cbnavbar">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyCH9ja1zUUqmhsxdSm4ke7Dh-96_XLKtrI"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,6 +26,8 @@
         <activity android:name=".MainActivity"/>
         <activity android:name=".LastKnown"/>
         <activity android:name=".geocode"/>
+        <activity android:name=".DetailTempat"/>
+        <activity android:name=".TipeLokasi"/>
     </application>
 
 </manifest>

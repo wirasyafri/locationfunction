@@ -84,6 +84,12 @@ public class MainActivityNavBar extends AppCompatActivity
         } else if (id == R.id.nav_slideshow) {
             Intent intentku= new Intent(MainActivityNavBar.this,MainActivity.class);
             startActivity(intentku);
+        }else if (id == R.id.nav_Detailtempat) {
+            Intent intentku= new Intent(MainActivityNavBar.this,DetailTempat.class);
+            startActivity(intentku);
+        }else if (id == R.id.nav_TipeLokasi) {
+            Intent intentku= new Intent(MainActivityNavBar.this,TipeLokasi.class);
+            startActivity(intentku);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

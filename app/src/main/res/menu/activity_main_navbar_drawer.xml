@@ -16,6 +16,15 @@
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_send"
             android:title="lokasi kontinu" />
+
+        <item
+            android:id="@+id/nav_Detailtempat"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Detail tempat" />
+        <item
+            android:id="@+id/nav_TipeLokasi"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Tipe Lokasi" />
     </group>
 
 
