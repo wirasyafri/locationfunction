@@ -21,7 +21,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 public class LastKnown extends AppCompatActivity {
-    Button mLocationButton;
+    Button mLocationButton,mPlacePickerButton;
     private Location mLastLocation;
     TextView mLocationTextView;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -35,6 +35,8 @@ public class LastKnown extends AppCompatActivity {
         mLocationButton = (Button) findViewById(R.id.button_location);
         mLocationTextView = (TextView) findViewById(R.id.textview_location);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mPlacePickerButton = (Button) findViewById(R.id.button_placepicker);
+        mPlacePickerButton.setVisibility(View.GONE);
 
         mLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override

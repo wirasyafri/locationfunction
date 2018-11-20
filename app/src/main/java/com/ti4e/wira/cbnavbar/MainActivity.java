@@ -22,7 +22,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 public class MainActivity extends AppCompatActivity implements DapatkanAlamatTask.onTaskSelesai{
-    Button mLocationButton;
+    Button mLocationButton,mPlacePickerButton;
     private Location mLastLocation;
     TextView mLocationTextView;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements DapatkanAlamatTas
         mAndroidImageView = (ImageView) findViewById(R.id.imageView) ;
         mRotateAnim = (AnimatorSet) AnimatorInflater.loadAnimator(this,R.animator.rotate);
         mRotateAnim.setTarget(mAndroidImageView);
+        mPlacePickerButton = (Button) findViewById(R.id.button_placepicker);
+        mPlacePickerButton.setVisibility(View.GONE);
 
         mLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override

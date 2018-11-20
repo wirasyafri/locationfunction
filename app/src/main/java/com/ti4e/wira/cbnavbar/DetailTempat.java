@@ -4,11 +4,14 @@ import android.Manifest;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -29,8 +32,12 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 public class DetailTempat extends AppCompatActivity implements DapatkanAlamatTask.onTaskSelesai{
-    Button mLocationButton;
+    Button mLocationButton,mPlacePickerButton;
     private Location mLastLocation;
     TextView mLocationTextView;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -57,12 +64,15 @@ public class DetailTempat extends AppCompatActivity implements DapatkanAlamatTas
         mAndroidImageView = (ImageView) findViewById(R.id.imageView) ;
         mRotateAnim = (AnimatorSet) AnimatorInflater.loadAnimator(this,R.animator.rotate);
         mRotateAnim.setTarget(mAndroidImageView);
+        mPlacePickerButton = (Button) findViewById(R.id.button_placepicker);
+        mPlacePickerButton.setVisibility(View.GONE);
 
         mLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!mTrackingLocation){
                     mulaiTrackingLokasi();
+//                    getAddress(-7.946465,112.615548);
                 }else {
                     stopTrackingLokasi();
                 }
@@ -170,6 +180,33 @@ public class DetailTempat extends AppCompatActivity implements DapatkanAlamatTas
                     Toast.makeText(this,"permission bapaknya gak bisa",Toast.LENGTH_SHORT).show();
                 }
                 break;
+        }
+    }
+
+    public void getAddress(double lat, double lng) {
+        Geocoder geocoder = new Geocoder(DetailTempat.this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            Address obj = addresses.get(0);
+            String add = obj.getAddressLine(0);
+            add = add + "\n" + obj.getCountryName();
+            add = add + "\n" + obj.getCountryCode();
+            add = add + "\n" + obj.getAdminArea();
+            add = add + "\n" + obj.getPostalCode();
+            add = add + "\n" + obj.getSubAdminArea();
+            add = add + "\n" + obj.getLocality();
+            add = add + "\n" + obj.getSubThoroughfare();
+            add = add + "\n" + obj.getFeatureName();
+
+            Log.v("IGA", "Address" + add);
+            // Toast.makeText(this, "Address=>" + add,
+            // Toast.LENGTH_SHORT).show();
+
+            // TennisAppActivity.showDialog(add);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }

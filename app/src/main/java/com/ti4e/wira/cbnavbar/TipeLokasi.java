@@ -30,7 +30,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.onTaskSelesai{
-    Button mLocationButton;
+    Button mLocationButton,mPlacePickerButton;
     private Location mLastLocation;
     TextView mLocationTextView;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -43,7 +43,6 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
 
     private boolean mTrackingLocation;
     private LocationCallback mLocationCalback;
-
     @Override
     public void onTaskCOmpleted(final String result) throws  SecurityException{
         if(mTrackingLocation){
@@ -62,13 +61,25 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
                             }
                         }
                         if(currentPlace != null){
-                            mLocationTextView.setText((getString(R.string.alamat_detail,currentPlace.getName(),result,System.currentTimeMillis())));
+                            mLocationTextView.setText((
+                                    getString(
+                                            R.string.alamat_detail,
+                                            currentPlace.getName(),
+                                            result,
+                                            System.currentTimeMillis())));
+                            setTipeLokasi(currentPlace);
                         }
                         likelyPlaces.release();
-                        setTipeLokasi(currentPlace);
+
+
                     }
                     else {
-                        mLocationTextView.setText(getString(R.string.alamat_detail,"nama lokasi tidak ditemukan",result,System.currentTimeMillis()));
+                        mLocationTextView.setText(
+                                getString(
+                                        R.string.alamat_detail,
+                                        "nama lokasi tidak ditemukan",
+                                        result,
+                                        System.currentTimeMillis()));
 
                     }
                 }
@@ -91,6 +102,8 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
         mAndroidImageView = (ImageView) findViewById(R.id.imageView) ;
         mRotateAnim = (AnimatorSet) AnimatorInflater.loadAnimator(this,R.animator.rotate);
         mRotateAnim.setTarget(mAndroidImageView);
+        mPlacePickerButton = (Button) findViewById(R.id.button_placepicker);
+        mPlacePickerButton.setVisibility(View.GONE);
 
         mLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,6 +191,17 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
                 case Place.TYPE_MOVIE_THEATER:
                     drawableId = R.drawable.bioskop;
                     break;
+                    //tambahan
+                case Place.TYPE_AIRPORT:
+                    drawableId = R.drawable.airport;
+                    break;
+                case Place.TYPE_ATM:
+                    drawableId = R.drawable.atm;
+                    break;
+                case Place.TYPE_MOSQUE:
+                    drawableId = R.drawable.mosque;
+                    break;
+
             }
         }
         if(drawableId < 0){

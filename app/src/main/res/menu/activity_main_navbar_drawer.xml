@@ -25,6 +25,11 @@
             android:id="@+id/nav_TipeLokasi"
             android:icon="@drawable/ic_menu_send"
             android:title="Tipe Lokasi" />
+
+        <item
+            android:id="@+id/nav_PlacePicker"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Place Picker" />
     </group>
 
 
