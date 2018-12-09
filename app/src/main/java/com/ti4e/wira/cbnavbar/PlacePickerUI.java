@@ -3,10 +3,12 @@ package com.ti4e.wira.cbnavbar;
 import android.Manifest;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -15,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -26,15 +30,17 @@ import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBufferResponse;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.onTaskSelesai{
+public class PlacePickerUI extends AppCompatActivity implements DapatkanAlamatTask.onTaskSelesai{
     Button mLocationButton,mPlacePickerButton;
     private Location mLastLocation;
     TextView mLocationTextView;
     private FusedLocationProviderClient mFusedLocationClient;
     private static final int REQUEST_LOCATION_PERMISSION =1;
+    private static final int REQUEST_PICK_PLACE =0;
     private ImageView mAndroidImageView;
     private AnimatorSet mRotateAnim;
 
@@ -43,7 +49,82 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
 
     private boolean mTrackingLocation;
     private LocationCallback mLocationCalback;
-    public static int  untukwidget = R.drawable.airport;
+    public static int drawable = R.drawable.airport;
+    String nama="",alamat="";
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //syntax untuk menyimpan instance berupa string dan integer
+        outState.putInt("gambar",drawable);
+        outState.putString("nama",nama);
+        outState.putString("alamat",alamat);
+    }
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState.getString("gambar") == ""){
+            mLocationTextView.setText("Pijet tombol untuk dapatkan lokasi anda");
+        }else{
+//syntax untuk merestore instance yang sebelumnya tersimpan
+            mAndroidImageView.setImageResource(savedInstanceState.getInt("gambar"));
+            mLocationTextView.setText(getString(R.string.alamat_detail,savedInstanceState.getString("nama"),savedInstanceState.getString("alamat"),System.currentTimeMillis()));
+        }
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
+
+        mLocationButton = (Button) findViewById(R.id.button_location);
+        mLocationTextView = (TextView) findViewById(R.id.textview_location);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mAndroidImageView = (ImageView) findViewById(R.id.imageView) ;
+        mRotateAnim = (AnimatorSet) AnimatorInflater.loadAnimator(this,R.animator.rotate);
+        mRotateAnim.setTarget(mAndroidImageView);
+
+
+        mLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!mTrackingLocation){
+                    mulaiTrackingLokasi();
+                }else {
+                    stopTrackingLokasi();
+                }
+
+            }
+        });
+
+        mPlacePickerButton = (Button) findViewById(R.id.button_placepicker);
+
+
+
+        mLocationCalback = new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (mTrackingLocation){
+                    new DapatkanAlamatTask(PlacePickerUI.this,PlacePickerUI.this).execute(locationResult.getLastLocation());
+                }
+            }
+        };
+        mPlacePickerButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                PlacePicker.IntentBuilder builder= new PlacePicker.IntentBuilder();
+                try {
+                    startActivityForResult(builder.build(PlacePickerUI.this),REQUEST_PICK_PLACE);
+                }catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e ){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
     @Override
     public void onTaskCOmpleted(final String result) throws  SecurityException{
         if(mTrackingLocation){
@@ -69,6 +150,11 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
                                             result,
                                             System.currentTimeMillis())));
                             setTipeLokasi(currentPlace);
+                            //code dibawah ini berfungsi untuk mengisi nilai variable yang akan disimpan di savedInstance
+                            drawable = setTipeLokasi(currentPlace);
+                            nama = currentPlace.getName().toString();
+                            alamat = result.toString();
+                            mAndroidImageView.setImageResource(drawable);
                         }
                         likelyPlaces.release();
 
@@ -89,46 +175,7 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
         }
 
     }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
-
-        mLocationButton = (Button) findViewById(R.id.button_location);
-        mLocationTextView = (TextView) findViewById(R.id.textview_location);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mAndroidImageView = (ImageView) findViewById(R.id.imageView) ;
-        mRotateAnim = (AnimatorSet) AnimatorInflater.loadAnimator(this,R.animator.rotate);
-        mRotateAnim.setTarget(mAndroidImageView);
-        mPlacePickerButton = (Button) findViewById(R.id.button_placepicker);
-        mPlacePickerButton.setVisibility(View.GONE);
-
-        mLocationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!mTrackingLocation){
-                    mulaiTrackingLokasi();
-                }else {
-                    stopTrackingLokasi();
-                }
-
-            }
-        });
-
-        mLocationCalback = new LocationCallback(){
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (mTrackingLocation){
-                    new DapatkanAlamatTask(TipeLokasi.this,TipeLokasi.this).execute(locationResult.getLastLocation());
-                }
-            }
-        };
-    }
-
-    public void mulaiTrackingLokasi(){
+    private void mulaiTrackingLokasi(){
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this,new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_LOCATION_PERMISSION
@@ -176,7 +223,7 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
         }
     }
 
-    private void  setTipeLokasi(Place currentPlace){
+    private int  setTipeLokasi(Place currentPlace){
         int drawableId= -1;
         for (Integer placeType : currentPlace.getPlaceTypes()){
             switch (placeType){
@@ -192,7 +239,7 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
                 case Place.TYPE_MOVIE_THEATER:
                     drawableId = R.drawable.bioskop;
                     break;
-                    //code tambahan untuk jenis tempat
+                //tambahan
                 case Place.TYPE_AIRPORT:
                     drawableId = R.drawable.airport;
                     break;
@@ -202,13 +249,30 @@ public class TipeLokasi extends AppCompatActivity implements DapatkanAlamatTask.
                 case Place.TYPE_MOSQUE:
                     drawableId = R.drawable.mosque;
                     break;
-
             }
         }
         if(drawableId < 0){
             drawableId = R.drawable.unknown;
         }
-        untukwidget = drawableId;
         mAndroidImageView.setImageResource(drawableId);
+        drawable = drawableId;
+        return drawableId;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK){
+            Place place = PlacePicker.getPlace(this,data);
+            setTipeLokasi(place);
+            mLocationTextView.setText(getString(R.string.alamat_detail,place.getName(),place.getAddress(),System.currentTimeMillis()));
+        }else {
+            mLocationTextView.setText("kok ga dipilih");
+        }
+
+    }
+
+    public int getDrawable() {
+        return drawable;
     }
 }
